@@ -15,22 +15,23 @@ A RESTful Task Management API built with FastAPI, PostgreSQL, and JWT authentica
 
 ```
 app/
-├── main.py              # Application entry point
-├── core/
-│   ├── config.py        # Environment configuration
-│   ├── database.py      # SQLAlchemy engine and session
-│   └── security.py      # Password hashing and JWT utilities
-├── models/
-│   ├── user.py          # User database model
-│   └── task.py          # Task database model
-├── schemas/
-│   ├── auth.py          # Authentication request/response schemas
-│   └── task.py          # Task request/response schemas
-├── routers/
-│   ├── auth.py          # Authentication endpoints
-│   └── tasks.py         # Task CRUD endpoints
-└── dependencies/
-    └── auth.py          # Authentication dependency
+├── main.py              # Entry point: Khởi tạo FastAPI, mount routers, init tables
+├── core/                # Các thành phần cấu hình cốt lõi dùng chung
+│   ├── config.py        # Quản lý cấu hình biến môi trường (.env) bằng Pydantic BaseSettings
+│   ├── database.py      # Thiết lập SQLAlchemy engine, SessionLocal và cơ chế retry kết nối
+│   └── security.py      # Thuật toán hash mật khẩu (bcrypt), tạo & decode JWT token
+├── models/              # Định nghĩa thực thể Database (SQLAlchemy ORM Models)
+│   ├── user.py          # Bảng users
+│   └── task.py          # Bảng tasks
+├── schemas/             # Data Transfer Objects (Pydantic Schemas - Request/Response Validation)
+│   ├── auth.py          # UserRegister, UserLogin, Token
+│   └── task.py          # TaskCreate, TaskUpdate, TaskResponse, TaskListResponse
+├── routers/             # Controller/Endpoints xử lý các luồng HTTP request
+│   ├── auth.py          # /api/v1/auth: register, login
+│   └── tasks.py         # /api/v1/tasks: CRUD, pagination, filter
+└── dependencies/        # Cơ chế Dependency Injection của FastAPI
+    └── auth.py          # Middleware get_current_user xác thực JWT Bearer token
+
 ```
 
 ## Environment Configuration
@@ -43,10 +44,10 @@ cp .env.example .env
 
 Required variables:
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `SECRET_KEY` | JWT signing secret |
+| Variable                      | Description                    |
+| ----------------------------- | ------------------------------ |
+| `DATABASE_URL`                | PostgreSQL connection string   |
+| `SECRET_KEY`                  | JWT signing secret             |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Token expiration (default: 30) |
 
 ## Local Development
@@ -66,20 +67,20 @@ Swagger documentation: `http://localhost:8000/docs`
 
 ### Authentication
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/auth/register` | Register a new user |
-| POST | `/api/v1/auth/login` | Login and receive JWT token |
+| Method | Endpoint                | Description                 |
+| ------ | ----------------------- | --------------------------- |
+| POST   | `/api/v1/auth/register` | Register a new user         |
+| POST   | `/api/v1/auth/login`    | Login and receive JWT token |
 
 ### Tasks (authentication required)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/tasks` | Create a task |
-| GET | `/api/v1/tasks` | List tasks (with pagination and filtering) |
-| GET | `/api/v1/tasks/{task_id}` | Get a single task |
-| PUT | `/api/v1/tasks/{task_id}` | Update a task |
-| DELETE | `/api/v1/tasks/{task_id}` | Delete a task |
+| Method | Endpoint                  | Description                                |
+| ------ | ------------------------- | ------------------------------------------ |
+| POST   | `/api/v1/tasks`           | Create a task                              |
+| GET    | `/api/v1/tasks`           | List tasks (with pagination and filtering) |
+| GET    | `/api/v1/tasks/{task_id}` | Get a single task                          |
+| PUT    | `/api/v1/tasks/{task_id}` | Update a task                              |
+| DELETE | `/api/v1/tasks/{task_id}` | Delete a task                              |
 
 ### Pagination and Filtering
 
