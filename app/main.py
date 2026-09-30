@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.core.database import engine, Base
-from app.models import user, task  # noqa: F401 — ensure models are registered
+from app.models import user, task  # noqa: F401 -- ensure models are registered
 from app.routers import auth, tasks
 
 Base.metadata.create_all(bind=engine)
